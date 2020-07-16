@@ -30,7 +30,10 @@ const resolvers: IResolvers = {
     ),
     updateTodo: async (root, { id, content, isDone }) => {
       const todo = await Todos.findOne({ _id: id });
-      return todo && Object.assign(todo, { content, isDone }) && todo.save().then(Boolean);
+      const obj: any = { content, isDone };
+      Object.keys(obj).forEach((key) => obj[key] == null && delete obj[key]);
+      Object.assign(todo, obj);
+      return todo?.save().then(Boolean);
     },
     removeTodo: (root, { id }) => (
       Todos.deleteOne({ _id: id }).then((res) => Boolean(res.deletedCount))
