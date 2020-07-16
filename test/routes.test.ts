@@ -1,6 +1,8 @@
 import request from 'supertest';
 import { mongoose } from '@typegoose/typegoose';
+import jwt from 'jsonwebtoken';
 
+import { JWT_SECRET } from '../config';
 import app from '../src/app';
 
 afterAll(() => {
@@ -103,4 +105,11 @@ describe('GraphQL-ToDoList CRUD tests', () => {
     expect(afterResp.status).toEqual(200);
     expect(afterResp.body.data.todos).not.toContainEqual({ id: todoId, content: '999', isDone: false });
   });
+});
+
+test('auth returns correct jwt', async () => {
+  const response = await request(app).get('/auth');
+  expect(response.status).toBe(200);
+  const payload: any = jwt.verify(response.text, JWT_SECRET);
+  expect(payload.userId).toHaveLength(24);
 });
