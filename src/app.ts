@@ -1,16 +1,18 @@
 import Koa from 'koa';
-import KoaRouter from 'koa-router';
 import koaBody from 'koa-bodyparser';
+import mongoose from 'mongoose';
+
+import router from './routes';
 
 const app = new Koa();
-const router = new KoaRouter();
 const PORT = 3000;
 
 // koaBody is needed just for POST.
 app.use(koaBody());
 
-router.get('/', (ctx) => {
-  ctx.body = 'hello!';
+mongoose.connect('mongodb://localhost:27017/graphql-todo', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
 app.use(router.routes());
