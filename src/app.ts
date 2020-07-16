@@ -17,4 +17,4 @@ mongoose.connect('mongodb://localhost:27017/graphql-todo', {
 
 app.use(router.routes());
 app.use(router.allowedMethods());
-app.listen(PORT);
+export default app.listen(PORT);
