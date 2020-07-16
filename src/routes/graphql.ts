@@ -2,7 +2,7 @@ import { ApolloServer, gql, IResolvers } from 'apollo-server-koa';
 import { Todos } from '../models/todo';
 
 // Mongoose has a `.id` getter which points to `._id` of the document.
-// Construct a schema, using GraphQL schema language
+// Query schema needs at least 1 parameter or parse error.
 const typeDefs = gql`
   type Todo {
     id: String
@@ -10,7 +10,7 @@ const typeDefs = gql`
     content: String
   }
   type Query {
-    todos(userId: Int): [Todo]
+    todos(userId: String): [Todo]
   }
   type Mutation {
     createTodo(content: String!, isDone: Boolean): Todo
@@ -22,11 +22,11 @@ const typeDefs = gql`
 // Provide resolver functions for your schema fields
 const resolvers: IResolvers = {
   Query: {
-    todos: () => Todos.find(),
+    todos: (root, args, { ctx }) => Todos.find({ userId: ctx.state.jwtdata.userId }),
   },
   Mutation: {
-    createTodo: (root, { content, isDone }) => (
-      new Todos({ content, isDone }).save()
+    createTodo: (root, { content, isDone }, { ctx }) => (
+      new Todos({ userId: ctx.state.jwtdata.userId, content, isDone }).save()
     ),
     updateTodo: async (root, { id, content, isDone }) => {
       const todo = await Todos.findOne({ _id: id });
@@ -38,6 +38,6 @@ const resolvers: IResolvers = {
   },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ typeDefs, resolvers, context: ({ ctx }) => ({ ctx }) });
 
 export default server.getMiddleware();
