@@ -2,7 +2,7 @@ import Koa from 'koa';
 import koaBody from 'koa-bodyparser';
 import mongoose from 'mongoose';
 
-import { PORT } from '../config';
+import { PORT, MONGODB_URL } from '../config';
 import router from './routes';
 
 const app = new Koa();
@@ -10,7 +10,7 @@ const app = new Koa();
 // koaBody is needed just for POST.
 app.use(koaBody());
 
-mongoose.connect('mongodb://localhost:27017/graphql-todo', {
+mongoose.connect(MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
